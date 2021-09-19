@@ -1,0 +1,5 @@
+newmtl TabletBody
+map_Kd body.png
+Kd 1 1 1
+d 1
+

@@ -1,0 +1,5 @@
+newmtl Display
+map_Kd MainDisplay.asset
+Kd 1 1 1
+d 1
+
