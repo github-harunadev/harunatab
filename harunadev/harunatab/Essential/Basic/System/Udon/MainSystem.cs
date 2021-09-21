@@ -8,7 +8,7 @@ using VRC.Udon.Common;
 
 public class MainSystem : UdonSharpBehaviour
 {
-    private string SystemVersion = "1.0.0000";
+    private string SystemVersion = "1.0.0001";
     private bool alreadyInitialized = false;
     private bool alreadyLateInitialized = false;
     public GameObject Pointer;
