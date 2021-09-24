@@ -75,6 +75,7 @@ public class MainHome : UdonSharpBehaviour
                     {
                         ((UdonBehaviour)item.GetComponent(typeof(UdonBehaviour))).SendCustomEvent("harudon_init");
                         UpdateInitBehaviour();
+                        harunatabSystem.SendCustomEvent("LaunchAppAnimation");
                     }
                 }
             }

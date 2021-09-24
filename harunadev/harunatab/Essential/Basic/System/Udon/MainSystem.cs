@@ -8,7 +8,7 @@ using VRC.Udon.Common;
 
 public class MainSystem : UdonSharpBehaviour
 {
-    private string SystemVersion = "1.0.0001";
+    private string SystemVersion = "1.1.0000";
     private bool alreadyInitialized = false;
     private bool alreadyLateInitialized = false;
     public GameObject Pointer;
@@ -35,6 +35,7 @@ public class MainSystem : UdonSharpBehaviour
     // 1 = Locked
     // 2 = Status Bar Expanded
     // 3 = Normal
+    // 4 = UI App exist
     public byte ScreenStatusTouch = 0;
     // 0 = No touch
     // 1 = Normal touch
@@ -44,13 +45,15 @@ public class MainSystem : UdonSharpBehaviour
     public GameObject UI_StatusBar;
     public GameObject UI_StatusBarExpand;
 
+    public Animator UI_Animation;
+
     public void addLog(string msg) { Log.text += msg + "\n"; }
 
     private void FixedUpdate()
     {
         if (alreadyInitialized && Networking.LocalPlayer != Networking.GetOwner(this.gameObject))
         {
-            if (ScreenStatus == 0)
+            /* if (ScreenStatus == 0)
             {
                 UI_Sleep.SetActive(true);
             }
@@ -72,7 +75,14 @@ public class MainSystem : UdonSharpBehaviour
                 UI_Lockscreen.SetActive(false);
                 UI_StatusBar.SetActive(true);
                 UI_StatusBarExpand.SetActive(false);
-            }
+            } */
+
+            // UI_Animation.SetInteger("Status", ScreenStatus);
+        }
+        for (int i = 0; i < UI_CurrentApp.transform.childCount; i++)
+        {
+            Transform t = UI_CurrentApp.transform.GetChild(i);
+            t.localScale = new Vector3(1, 1, 1);
         }
     }
 
@@ -309,53 +319,87 @@ public class MainSystem : UdonSharpBehaviour
 
     public void System_OpenStatusBar()
     {
-        UI_StatusBar.SetActive(false);
-        UI_StatusBarExpand.SetActive(true);
+        // UI_StatusBar.SetActive(false);
+        // UI_StatusBarExpand.SetActive(true);
         ScreenStatus = 2;
-        RequestSerialization();
+        RequestSerialization(); 
+        UI_Animation.Play("Base Layer.OpenStatusBar");
     }
 
     public void System_CloseStatusBar()
     {
-        UI_StatusBar.SetActive(true);
-        UI_StatusBarExpand.SetActive(false);
+        // UI_StatusBar.SetActive(true);
+        // UI_StatusBarExpand.SetActive(false);
         ScreenStatus = 3;
         RequestSerialization();
+        UI_Animation.Play("Base Layer.CloseStatusBar");
     }
 
     public void System_LockScreen()
     {
         ScreenStatus = 1;
         RequestSerialization();
-        UI_Lockscreen.SetActive(true);
+        // UI_Lockscreen.SetActive(true);
+        UI_Animation.Play("Base Layer.DisplayOffToLock");
     }
 
     public void System_UnlockScreen()
     {
         ScreenStatus = 3;
         RequestSerialization();
-        UI_Lockscreen.SetActive(false);
+        // UI_Lockscreen.SetActive(false);
+        UI_Animation.Play("Base Layer.LockToHome");
     }
 
     public void System_DisplayOn()
     {
-        UI_Sleep.SetActive(false);
+        // UI_Sleep.SetActive(false);
         System_LockScreen();
+        //UI_Animation.Play("Base Layer.LockToHome");
     }
 
     public void System_DisplayOff()
     {
-        UI_Sleep.SetActive(true);
-        ScreenStatus = 0;
+        // UI_Sleep.SetActive(true);
         RequestSerialization();
+        if (ScreenStatus == 3)
+        {
+            UI_Animation.Play("Base Layer.DisplayOff");
+        } else {
+            UI_Animation.Play("Base Layer.LockToDisplayOff");
+        }
+        ScreenStatus = 0;
     }
 
     public void System_GoHome()
     {
+        if (UI_CurrentApp.transform.childCount > 0)
+        {
+            ExitAppAnimation();
+        }
+        SendCustomEventDelayedSeconds("DelayedAppSuspend", 0.17F);
+    }
+
+    public void DelayedAppSuspend()
+    {
         for(int i = 0; i < UI_CurrentApp.transform.childCount; i++)
         {
-            ((UdonBehaviour)UI_CurrentApp.transform.GetChild(i).GetComponent(typeof(UdonBehaviour))).SendCustomEvent("harudon_stop");
-            UI_CurrentApp.transform.GetChild(i).SetParent(UI_SuspendedApp.transform);
+            Transform t = UI_CurrentApp.transform.GetChild(i);
+            ((UdonBehaviour)t.gameObject.GetComponent(typeof(UdonBehaviour))).SendCustomEvent("harudon_stop");
+            t.SetParent(UI_SuspendedApp.transform);
+            t.localScale = new Vector3(1, 1, 1);
         }
+    }
+
+    public void LaunchAppAnimation()
+    {
+        UI_Animation.SetInteger("Status", 1);
+        UI_Animation.Play("Base Layer.HomeToApp");
+    }
+
+    public void ExitAppAnimation()
+    {
+        UI_Animation.SetInteger("Status", 0);
+        UI_Animation.Play("Base Layer.AppToHome");
     }
 }
