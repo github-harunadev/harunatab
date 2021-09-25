@@ -30,7 +30,7 @@ public class MainHome : UdonSharpBehaviour
         for(int i = 0; i < Behaviours.transform.childCount; i++)
         {
             GameObject item = Behaviours.transform.GetChild(i).gameObject;
-            if (item.name != "INIT" && item.name != "Home")
+            if (item.name != "INIT" && item.name != "Home" && item.activeSelf)
             {
                 GameObject LauncherIcon = VRCInstantiate(Item);
                 LauncherIcon.SetActive(true);

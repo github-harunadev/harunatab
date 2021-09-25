@@ -1,14 +1,12 @@
-﻿
-using UdonSharp;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
+using VRC.SDK3.Components;
 using VRC.SDKBase;
 using VRC.Udon;
-using VRC.Udon.Common;
-
+using UdonSharp;
+using UnityEngine.UI;
 public class MainSystem : UdonSharpBehaviour
 {
-    private string SystemVersion = "1.1.0000";
+    private string SystemVersion = "1.1.0001";
     private bool alreadyInitialized = false;
     private bool alreadyLateInitialized = false;
     public GameObject Pointer;
@@ -53,29 +51,29 @@ public class MainSystem : UdonSharpBehaviour
     {
         if (alreadyInitialized && Networking.LocalPlayer != Networking.GetOwner(this.gameObject))
         {
-            /* if (ScreenStatus == 0)
-            {
-                UI_Sleep.SetActive(true);
-            }
-            else if (ScreenStatus == 1)
-            {
-                UI_Sleep.SetActive(false);
-                UI_Lockscreen.SetActive(true);
-            }
-            else if (ScreenStatus == 2)
-            {
-                UI_Sleep.SetActive(false);
-                UI_Lockscreen.SetActive(false);
-                UI_StatusBar.SetActive(false);
-                UI_StatusBarExpand.SetActive(true);
-            }
-            else if (ScreenStatus == 3)
-            {
-                UI_Sleep.SetActive(false);
-                UI_Lockscreen.SetActive(false);
-                UI_StatusBar.SetActive(true);
-                UI_StatusBarExpand.SetActive(false);
-            } */
+            // if (ScreenStatus == 0)
+            // {
+            //     UI_Sleep.SetActive(true);
+            // }
+            // else if (ScreenStatus == 1)
+            // {
+            //     UI_Sleep.SetActive(false);
+            //     UI_Lockscreen.SetActive(true);
+            // }
+            // else if (ScreenStatus == 2)
+            // {
+            //     UI_Sleep.SetActive(false);
+            //     UI_Lockscreen.SetActive(false);
+            //     UI_StatusBar.SetActive(false);
+            //     UI_StatusBarExpand.SetActive(true);
+            // }
+            // else if (ScreenStatus == 3)
+            // {
+            //     UI_Sleep.SetActive(false);
+            //     UI_Lockscreen.SetActive(false);
+            //     UI_StatusBar.SetActive(true);
+            //     UI_StatusBarExpand.SetActive(false);
+            // }
 
             // UI_Animation.SetInteger("Status", ScreenStatus);
         }
@@ -105,7 +103,7 @@ public class MainSystem : UdonSharpBehaviour
             for (int i = 0; i < Behaviours.transform.childCount; i++)
             {
                 GameObject item = Behaviours.transform.GetChild(i).gameObject;
-                if (item.name != "INIT")
+                if (item.name != "INIT" && item.activeSelf)
                 {
                     addLog("[ SYST ] Verifying " + item.name + " harudon behaviours");
                     ((UdonBehaviour)item.GetComponent(typeof(UdonBehaviour))).SendCustomEvent("harudon_verify");
@@ -154,12 +152,12 @@ public class MainSystem : UdonSharpBehaviour
     public void SendOutLateInit()
     {
         alreadyLateInitialized = true;
-        foreach(string BehaviourItemName in InitBehaviours)
+        foreach (string BehaviourItemName in InitBehaviours)
         {
             for (int i = 0; i < Behaviours.transform.childCount; i++)
             {
                 GameObject item = Behaviours.transform.GetChild(i).gameObject;
-                if (item.name == BehaviourItemName)
+                if (item.name == BehaviourItemName && item.activeSelf)
                 {
                     addLog("[ SYST ] Sending lateinit event to " + item.name + " harudon behaviour");
                     ((UdonBehaviour)item.GetComponent(typeof(UdonBehaviour))).SendCustomEvent("harudon_lateinit");
@@ -194,12 +192,14 @@ public class MainSystem : UdonSharpBehaviour
                 if (UI_CurrentApp.transform.childCount > 0)
                 {
                     System_GoHome();
-                } else
+                }
+                else
                 {
                     System_DisplayOff();
                 }
             }
-        } else
+        }
+        else
         {
             harudon_init();
         }
@@ -210,7 +210,8 @@ public class MainSystem : UdonSharpBehaviour
         if (ScreenStatus == 0)
         {
 
-        } else if (ScreenStatus == 3)
+        }
+        else if (ScreenStatus == 3)
         {
             ScreenStatusTouch = 1;
             if (UI_CurrentApp.transform.childCount < 1)
@@ -226,7 +227,8 @@ public class MainSystem : UdonSharpBehaviour
             {
                 System_OpenStatusBar();
             }
-        } else
+        }
+        else
         {
             ScreenStatusTouch = 2;
             System_Touch_Down();
@@ -242,11 +244,13 @@ public class MainSystem : UdonSharpBehaviour
             if (UI_CurrentApp.transform.childCount < 1)
             {
                 ((UdonBehaviour)UI_Home.GetComponent(typeof(UdonBehaviour))).SendCustomEvent("Touch_Up");
-            } else
+            }
+            else
             {
                 ((UdonBehaviour)(UI_CurrentApp.transform.GetChild(0)).gameObject.GetComponent(typeof(UdonBehaviour))).SendCustomEvent("Touch_Up");
             }
-        } else if (ScreenStatusTouch == 2)
+        }
+        else if (ScreenStatusTouch == 2)
         {
             ScreenStatusTouch = 0;
             System_Touch_Up();
@@ -289,7 +293,8 @@ public class MainSystem : UdonSharpBehaviour
             {
                 System_CloseStatusBar();
             }
-        } else if (ScreenStatus == 1)
+        }
+        else if (ScreenStatus == 1)
         {
             if (PointerPosition.x >= 0 && PointerPosition.x <= 1920 && PointerPosition.z >= 0 && PointerPosition.z <= 1080)
             {
@@ -300,7 +305,7 @@ public class MainSystem : UdonSharpBehaviour
 
     public void System_Touch_Up()
     {
-        
+
     }
 
     public void System_Touch_Stay()
@@ -322,7 +327,7 @@ public class MainSystem : UdonSharpBehaviour
         // UI_StatusBar.SetActive(false);
         // UI_StatusBarExpand.SetActive(true);
         ScreenStatus = 2;
-        RequestSerialization(); 
+        RequestSerialization();
         UI_Animation.Play("Base Layer.OpenStatusBar");
     }
 
@@ -365,7 +370,9 @@ public class MainSystem : UdonSharpBehaviour
         if (ScreenStatus == 3)
         {
             UI_Animation.Play("Base Layer.DisplayOff");
-        } else {
+        }
+        else
+        {
             UI_Animation.Play("Base Layer.LockToDisplayOff");
         }
         ScreenStatus = 0;
@@ -382,7 +389,7 @@ public class MainSystem : UdonSharpBehaviour
 
     public void DelayedAppSuspend()
     {
-        for(int i = 0; i < UI_CurrentApp.transform.childCount; i++)
+        for (int i = 0; i < UI_CurrentApp.transform.childCount; i++)
         {
             Transform t = UI_CurrentApp.transform.GetChild(i);
             ((UdonBehaviour)t.gameObject.GetComponent(typeof(UdonBehaviour))).SendCustomEvent("harudon_stop");

@@ -306,8 +306,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "<size=60>harunaOS</size>\n<size=40>Version 1.0.0001</size>\n\nMade with
-    \u2665 by harunadev\n\nharunatab system version 1.0.0001\n\nhttps://harunadev.booth.pm/items/3288277\nhttps://github.com/github-harunadev/harunatab"
+  m_Text: "<size=60>harunaOS</size>\n<size=40>Version 1.1.0000</size>\n\nMade with
+    \u2665 by harunadev\n\nharunatab system version 1.1.0000\n\nhttps://harunadev.booth.pm/items/3288277\nhttps://github.com/github-harunadev/harunatab"
 --- !u!1 &3556446613531312915
 GameObject:
   m_ObjectHideFlags: 0
